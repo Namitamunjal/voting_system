@@ -1,32 +1,29 @@
-
-//For this project, create a simple contract with 2-3 functions.
-//Then show the values of those functions in frontend of the application.
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract VotingSystem{
-    struct Candidate {
-        string name;
-        uint256 voteCount;
+contract VotingSystem {
+    string[] public candidates;
+    mapping(uint256 => uint256) public votesReceived; // Use a mapping to store the votes for each candidate
+
+    constructor(string[] memory candidateNames) {
+        candidates = candidateNames;
     }
 
-    mapping(address => bool) public voters;
-    mapping(uint256 => Candidate) public candidates;
-    uint256 public candidatesCount;
-
-    constructor(string[] memory _candidateNames) {
-        for (uint256 i = 0; i < _candidateNames.length; i++) {
-            candidatesCount++;
-            candidates[candidatesCount] = Candidate(_candidateNames[i], 0);
-        }
+    // Function to cast a vote for a candidate
+    function vote(uint256 candidateIndex) public {
+        require(candidateIndex < candidates.length, "Invalid candidate index");
+        votesReceived[candidateIndex]++;
     }
 
-    function vote(uint256 _candidateId) external {
-        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID");
-        require(!voters[msg.sender], "You have already voted");
 
-        candidates[_candidateId].voteCount++;
-        voters[msg.sender] = true;
+    // Function to get the number of candidates
+    function getCandidatesCount() public view returns (uint256) {
+        return candidates.length;
+    }
+
+    // Function to get the number of votes for a specific candidate
+    function getVotesCount(uint256 candidateIndex) public view returns (uint256) {
+        require(candidateIndex < candidates.length, "Invalid candidate index");
+        return votesReceived[candidateIndex];
     }
 }
